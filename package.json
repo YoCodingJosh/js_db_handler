@@ -1,0 +1,29 @@
+{
+  "name": "db",
+  "version": "1.0.0",
+  "description": "Oshiete Database migration scripts and test data generator",
+  "main": "index.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oshiete/db.git"
+  },
+  "author": "HYPEWORKS",
+  "private": "true",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/oshiete/db/issues"
+  },
+  "homepage": "https://github.com/oshiete/db#readme",
+  "dependencies": {
+    "cli-progress": "^3.10.0",
+    "dotenv": "^16.0.0",
+    "pg": "^8.7.3"
+  },
+  "devDependencies": {
+    "bcrypt": "^5.0.1",
+    "docker-cli-js": "^2.9.0"
+  }
+}
