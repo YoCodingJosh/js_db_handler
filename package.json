@@ -1,10 +1,12 @@
 {
   "name": "db",
   "version": "1.0.0",
-  "description": "Oshiete Database migration scripts and test data generator",
-  "main": "index.js",
+  "description": "Oshiete database migration scripts and test data generator",
+  "main": "main.js",
+  "type": "module",
   "scripts": {
-    "start": "node main.js"
+    "start": "node main.js",
+    "start-dev": "node dev.js --start-dev"
   },
   "repository": {
     "type": "git",
@@ -19,6 +21,7 @@
   "homepage": "https://github.com/oshiete/db#readme",
   "dependencies": {
     "cli-progress": "^3.10.0",
+    "cli-spinners": "^2.6.1",
     "dotenv": "^16.0.0",
     "pg": "^8.7.3"
   },
