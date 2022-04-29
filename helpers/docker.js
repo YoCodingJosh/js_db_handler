@@ -44,7 +44,7 @@ let createContainer = function (env) {
  * @param {DockerOptions|undefined} options Optional options to pass in to Docker. Defaults to defaultDockerOptions defined at the top 
  * @returns {Promise} a promise that you'll need to await to snatch that value
  */
-function __dockerPromiseWrapper(command, options) {
+async function __dockerPromiseWrapper(command, options) {
     if (options === undefined) options = defaultDockerOptions
     let docker = new Docker(options);
 
@@ -57,6 +57,27 @@ function __dockerPromiseWrapper(command, options) {
             }
         });
     });
+}
+
+let startContainer = async function() {
+    const spinner = ora({
+        spinner: 'arc',
+        text: `Starting Postgres...`,
+    });
+
+    spinner.start();
+
+    try {
+        await __dockerPromiseWrapper('start oshiete-db');
+
+        spinner.stop();
+        console.log('🚀 Postgres started!');
+    }
+    catch (err) {
+        spinner.stop();
+
+        throw err;
+    }
 }
 
 /**
@@ -79,25 +100,45 @@ let stopContainer = async function () {
     catch (err) {
         spinner.stop();
 
-        // try to be a bit smart
-        if (err.stderr === 'Error response from daemon: No such container: oshiete-db\n') {
-            console.log('💡 Couldn\'t stop the Postgres container. Perhaps it was not running?');
-        } else {
-            console.error(err.stderr);
-        }
+        throw err;
     }
 };
 
-let checkContainerCreated = function () {
+async function __getContainerInfo() {
+    try {
+        let output = await __dockerPromiseWrapper('ps --all');
+
+        return output.containerList.find(x => x.names === 'oshiete-db');
+    }
+    catch (err) {
+        // just bubble up like soda pop
+        throw err;
+    }
+}
+
+let checkContainerCreated = async function () {
+    try {
+        return await __getContainerInfo() !== undefined;
+    }
+    catch (err) {
+        throw err;
+    }
 };
 
-let checkContainerRunning = function () {
+let checkContainerRunning = async function () {
+    try {
+        let data = await __getContainerInfo();
 
+        return data !== undefined && data.status.startsWith('Up')
+    }
+    catch (err) {
+        throw err;
+    }
 };
 
 /**
  * Checks to see if Docker is installed and the daemon has been started.
- * @returns {Boolean} true if Docker is installed and started, false otherwise.
+ * @returns {Promise<boolean>} true if Docker is installed and started, false otherwise.
  */
 let checkDocker = async function () {
     try {
@@ -110,15 +151,16 @@ let checkDocker = async function () {
     }
 };
 
-let cleanupDocker = function () {
+let cleanUpContainer = function () {
 
 };
 
 export {
     createContainer,
+    startContainer,
     stopContainer,
     checkContainerCreated,
     checkContainerRunning,
     checkDocker,
-    cleanupDocker,
+    cleanUpContainer,
 }

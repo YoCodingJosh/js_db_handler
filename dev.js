@@ -1,7 +1,7 @@
 import { config as dotenvConfig } from 'dotenv';
 
 import { showHelp } from './helpers/help.js';
-import { createContainer, stopContainer, checkContainerCreated, checkContainerRunning, checkDocker } from './helpers/docker.js';
+import { createContainer, startContainer, stopContainer, checkContainerCreated, checkContainerRunning, checkDocker } from './helpers/docker.js';
 
 import { __dirname } from './path.js'
 
@@ -12,6 +12,8 @@ var args = process.argv.slice(2);
 
 if (args.length == 0 || args[0] === "--help") {
     showHelp();
+
+    process.exit(0);
 }
 
 if (!await checkDocker()) {
@@ -20,9 +22,25 @@ if (!await checkDocker()) {
 }
 
 if (args[0] === '--start-dev') {
-    createContainer(process.env);
+    if (!await checkContainerCreated()) {
+        createContainer(process.env);
+    }
+
+    if (!await checkContainerRunning()) {
+        await startContainer();
+    }
 }
 
 if (args[0] == '--stop-dev') {
+    if (!await checkContainerCreated()) {
+        console.log('💡 Could not stop the Postgres container. Perhaps it was not created? 🤔💭💀');
+        process.exit(-2);
+    }
+
+    if (!await checkContainerRunning()) {
+        console.log('💡 Could not stop the Postgres container. Perhaps it is not running? 🤔💭🏃‍♂️');
+        process.exit(-3);
+    }
+
     await stopContainer();
 }
