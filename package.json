@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node main.js",
-    "start-dev": "node dev.js --start-dev"
+    "start-dev": "node dev.js --start-dev",
+    "stop-dev": "node dev.js --stop-dev"
   },
   "repository": {
     "type": "git",
