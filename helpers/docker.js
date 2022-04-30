@@ -57,7 +57,7 @@ async function __dockerPromiseWrapper(command, options) {
             }
         });
     });
-}
+};
 
 let startContainer = async function() {
     const spinner = ora({
@@ -78,7 +78,7 @@ let startContainer = async function() {
 
         throw err;
     }
-}
+};
 
 /**
  * Stops the database container
@@ -114,7 +114,7 @@ async function __getContainerInfo() {
         // just bubble up like soda pop
         throw err;
     }
-}
+};
 
 let checkContainerCreated = async function () {
     try {
@@ -163,4 +163,4 @@ export {
     checkContainerRunning,
     checkDocker,
     cleanUpContainer,
-}
+};

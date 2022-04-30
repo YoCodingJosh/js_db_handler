@@ -7,4 +7,4 @@ const __dirname = path.dirname(__filename);
 export {
     __filename,
     __dirname,
-}
+};
