@@ -3,52 +3,92 @@ const { Pool } = pkg;
 
 import ora from 'ora';
 
-import { timeoutPromise } from '../utils.js';
-
-const pool = __createConnectionPool();
+import { timeoutPromise, bookSpinner } from '../utils.js';
 
 function __createConnectionPool(env) {
     return new Pool({
-        user: 'me',
-        host: 'localhost',
-        database: 'api',
-        password: 'password',
-        port: 5432,
-    })
+        user: env.PGUSER,
+        host: env.PGHOST,
+        database: env.PGDATABASE,
+        password: env.PGPASSWORD,
+        port: env.PGPORT,
+    });
 }
 
-const bookSpinner = {
-    interval: 300,
-    frames: ['📒', '📖', '📔', '📖', '📕', '📖', '📗', '📖', '📘', '📖', '📙', '📖'],
+class DB {
+    /**
+     * Creates instance of DB
+     * @param {NodeJS.ProcessEnv|undefined} env environment variables with the connection details or undefined to just do static typing
+     */
+    constructor(env) {
+        if (env === undefined) {
+            // no-op so we can have some semblance of static typing
+            return;
+        }
+
+        if (!DB.instance) {
+            DB.instance = this;
+
+            this.pool = __createConnectionPool(env);
+        }
+
+        return DB.instance;
+    }
+
+    get dbPool() {
+        return this.pool;
+    }
+
+    async checkDatabaseConnection() {
+        const spinner = ora({
+            spinner: 'earth',
+            text: 'Checking database connection...',
+        });
+
+        spinner.start();
+
+        await timeoutPromise((resolve) => {
+            spinner.stop();
+            console.log('🔌 Connected!');
+            console.log(this.pool);
+            resolve();
+        }, 1500);
+    }
+
+    async processMigrations() {
+        const spinner = ora({
+            spinner: bookSpinner,
+            text: 'Checking migrations...',
+        });
+
+        spinner.start();
+
+        await timeoutPromise((resolve) => {
+            spinner.stop();
+
+            console.log('✅ Checked migrations!');
+
+            resolve();
+        }, 3333);
+    }
 };
 
-let checkDatabaseConnection = async function (env) {
-    const spinner = ora({
-        spinner: 'dots',
-        text: 'Checking database connection...',
-    });
+/**
+ * The database driver wrapper.
+ */
+let __dbInstance = new DB();
 
-    spinner.start();
-};
+/**
+ * Initializes the database driver
+ * @param {NodeJS.ProcessEnv} env 
+ */
+function initDB(env) {
+    __dbInstance = new DB(env);
 
-let processMigrations = async function (env) {
-    const spinner = ora({
-        spinner: bookSpinner,
-        text: 'Checking migrations...',
-    });
-
-    spinner.start();
-
-    await timeoutPromise((resolve) => {
-        spinner.stop();
-    
-        console.log('✅ Checked migrations!');
-
-        resolve();
-    }, 3333);
-};
+    Object.freeze(__dbInstance);
+}
 
 export {
-    checkDatabaseConnection,
-    processMigrations,
+    __dbInstance as DB,
+    initDB,
 };

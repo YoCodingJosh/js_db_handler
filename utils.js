@@ -12,6 +12,12 @@ let timeoutPromise = function(callback, time) {
     });
 };
 
+const bookSpinner = {
+    interval: 300,
+    frames: ['📒', '📖', '📔', '📖', '📕', '📖', '📗', '📖', '📘', '📖', '📙', '📖'],
+};
+
 export {
     timeoutPromise,
+    bookSpinner,
 };

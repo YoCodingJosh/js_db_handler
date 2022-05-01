@@ -2,7 +2,7 @@ import { config as dotenvConfig } from 'dotenv';
 
 import { showHelp } from './helpers/help.js';
 import { createContainer, startContainer, stopContainer, checkContainerCreated, checkContainerRunning, checkDocker } from './helpers/docker.js';
-import { processMigrations } from './helpers/db.js';
+import { DB, initDB } from './helpers/db.js';
 
 import { __dirname } from './path.js'
 
@@ -32,9 +32,11 @@ if (args[0] === '--start-dev') {
     }
     else {
         console.log('😸 Postgres already started.');
-
-        await processMigrations();
     }
+
+    initDB(process.env);
+
+    await DB.checkDatabaseConnection();
 }
 
 if (args[0] == '--stop-dev') {
