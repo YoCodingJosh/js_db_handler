@@ -3,7 +3,7 @@
 CREATE TABLE [IF NOT EXISTS] migration_statuses (
     id serial PRIMARY KEY,
     status VARCHAR(20),
-    description VARCHAR(255)
+    description TEXT
 );
 
 -- Creates the migrations table
@@ -14,4 +14,5 @@ CREATE TABLE [IF NOT EXISTS] migrations (
     FOREIGN KEY(migration_status)
         REFERENCES migration_statuses(id) NOT NULL,
     step_timestamp TIMESTAMP,
+    message TEXT
 );
