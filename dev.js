@@ -23,15 +23,18 @@ if (!await checkDocker()) {
 }
 
 if (args[0] === '--start-dev') {
-    if (!await checkContainerCreated()) {
-        createContainer(process.env);
+    const isFreshStart = !await checkContainerCreated();
+    if (isFreshStart) {
+        await createContainer(process.env);
     }
 
     if (!await checkContainerRunning()) {
         await startContainer();
     }
     else {
-        console.log('😸 Postgres already started.');
+        if (!isFreshStart) {
+            console.log('😸 Postgres already started.');
+        }
     }
 
     initDB(process.env);

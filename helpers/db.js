@@ -35,10 +35,6 @@ class DB {
         return DB.instance;
     }
 
-    get dbPool() {
-        return this.pool;
-    }
-
     async checkDatabaseConnection() {
         const spinner = ora({
             spinner: 'earth',
@@ -47,12 +43,28 @@ class DB {
 
         spinner.start();
 
-        await timeoutPromise((resolve) => {
-            spinner.stop();
+        let result = true;
+
+        result = this.pool.connect((err, client, release) => {
+            if (err) {
+                console.error('Error acquiring client', err.stack);
+                return false;
+            }
+            client.query('SELECT NOW()', (err, result) => {
+                release();
+                if (err) {
+                    console.error('Error executing query', err.stack);
+                    return false;
+                }
+                return true;
+            });
+        });
+
+        spinner.stop();
+
+        if (result) {
             console.log('🔌 Connected!');
-            console.log(this.pool);
-            resolve();
-        }, 1500);
+        }
     }
 
     async processMigrations() {

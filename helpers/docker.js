@@ -11,11 +11,9 @@ const defaultDockerOptions = new DockerOptions(null, __dirname, false);
  * Pulls the latest Postgres Docker images and starts the database.
  * @param {NodeJS.ProcessEnv} env Environment variables that have the database credentials
  */
-let createContainer = function (env) {
+let createContainer = async function (env) {
     const pullPostgresImageCommand = `pull postgres:${env.PGVERSION}`;
-    const startCommand = `run -p ${env.PGPORT}:${env.PGPORT} --name oshiete-db -e POSTGRES_USER=${env.PGUSER} -e POSTGRES_PASSWORD=${env.PGPASSWORD} -d postgres:${env.PGVERSION}`;
-
-    let docker = new Docker(defaultDockerOptions);
+    const startCommand = `run -p ${env.PGPORT}:${env.PGPORT} --name oshiete-db -e POSTGRES_USER=${env.PGUSER} -e POSTGRES_DB=${env.PGDATABASE} -e POSTGRES_PASSWORD=${env.PGPASSWORD} -d postgres:${env.PGVERSION}`;
 
     const spinner = ora({
         spinner: 'line',
@@ -24,18 +22,23 @@ let createContainer = function (env) {
 
     spinner.start();
 
-    docker.command(pullPostgresImageCommand).then((data) => {
+    try {
+        await __dockerPromiseWrapper(pullPostgresImageCommand);
+
         spinner.clear();
 
         console.log(`✅ Pulled Postgres ${env.PGVERSION} image!`);
 
         spinner.text = 'Starting Postgres...';
 
-        docker.command(startCommand).then((data) => {
-            spinner.stop();
-            console.log('✅ Started Postgres!');
-        });
-    });
+        await __dockerPromiseWrapper(startCommand);
+
+        spinner.stop();
+        console.log('✅ Started Postgres!');
+    }
+    catch (err) {
+        throw err;
+    }
 };
 
 /**
@@ -59,7 +62,7 @@ async function __dockerPromiseWrapper(command, options) {
     });
 };
 
-let startContainer = async function() {
+let startContainer = async function () {
     const spinner = ora({
         spinner: 'arc',
         text: `Starting Postgres...`,
