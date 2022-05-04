@@ -2,7 +2,7 @@ import { config as dotenvConfig } from 'dotenv';
 
 import { showHelp } from './helpers/help.js';
 import { createContainer, startContainer, stopContainer, checkContainerCreated, checkContainerRunning, checkDocker } from './helpers/docker.js';
-import { DB, initDB } from './helpers/db.js';
+import { closeDB, DB, initDB } from './helpers/db.js';
 
 import { __dirname } from './path.js'
 
@@ -40,6 +40,8 @@ if (args[0] === '--start-dev') {
     initDB(process.env);
 
     await DB.checkDatabaseConnection();
+
+    closeDB();
 }
 
 if (args[0] == '--stop-dev') {

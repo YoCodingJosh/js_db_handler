@@ -45,25 +45,27 @@ class DB {
 
         let result = true;
 
-        result = this.pool.connect((err, client, release) => {
-            if (err) {
-                console.error('Error acquiring client', err.stack);
-                return false;
-            }
-            client.query('SELECT NOW()', (err, result) => {
-                release();
+        result = await new Promise((resolve, reject) => {
+            this.pool.connect((err, client, release) => {
                 if (err) {
-                    console.error('Error executing query', err.stack);
-                    return false;
+                    console.error('Error acquiring client', err.stack);
+                    reject(err);
                 }
-                return true;
+                client.query('SELECT NOW()', (err, result) => {
+                    release();
+                    if (err) {
+                        console.error('Error executing query', err.stack);
+                        reject(err);
+                    }
+                    resolve(true);
+                });
             });
         });
 
         spinner.stop();
 
         if (result) {
-            console.log('🔌 Connected!');
+            console.log('📡 Connected!');
         }
     }
 
@@ -100,7 +102,15 @@ function initDB(env) {
     Object.freeze(__dbInstance);
 }
 
+function closeDB() {
+    __dbInstance.pool.end();
+
+    // unfreeze, so we can reinit later (not sure why tho)
+    __dbInstance = undefined;
+}
+
 export {
     __dbInstance as DB,
     initDB,
+    closeDB,
 };
