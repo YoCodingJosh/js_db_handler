@@ -1,7 +1,7 @@
 import { config as dotenvConfig } from 'dotenv';
 
 import { showHelp } from './helpers/help.js';
-import { createContainer, startContainer, stopContainer, checkContainerCreated, checkContainerRunning, checkDocker, checkVolumeExists, createVolume, removeVolume } from './helpers/docker.js';
+import { createContainer, startContainer, stopContainer, checkContainerCreated, checkContainerRunning, checkDocker, checkVolumeExists, createVolume, removeVolume, cleanUpContainer } from './helpers/docker.js';
 import { closeDB, DB, initDB } from './helpers/db.js';
 
 import { __dirname } from './path.js'
@@ -38,15 +38,10 @@ if (args[0] === '--start-dev') {
     if (!await checkContainerRunning()) {
         await startContainer();
     }
-    else {
-        if (wasContainerCreated) {
-            console.log('😸 Postgres already started.');
-        }
-    }
 
     // there's a race condition between when the container is ready vs when postgres is ready
     if (!wasContainerCreated) {
-        await sleepFunction(1250, '😴 Resting and waiting for Postgres to be ready', '🌞 Well rested');
+        await sleepFunction(1250, '😴 Resting and waiting for Postgres to be ready...', '🌞 Well rested');
     }
 
     initDB(process.env);
@@ -75,7 +70,7 @@ else if (args[0] === '--reset-data') {
             process.exit(0);
         }
         
-        // TODO: remove container lmao
+        await cleanUpContainer();
 
         await removeVolume();
 

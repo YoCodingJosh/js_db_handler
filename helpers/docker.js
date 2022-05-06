@@ -7,6 +7,7 @@ import ora from 'ora';
 
 const defaultDockerOptions = new DockerOptions(null, __dirname, false);
 
+const containerName = 'oshiete-db';
 const volumeName = 'oshiete-data-volume';
 
 let createVolume = async function () {
@@ -51,7 +52,7 @@ let removeVolume = async function () {
  */
 let createContainer = async function (env) {
     const pullPostgresImageCommand = `pull postgres:${env.PGVERSION}`;
-    const startCommand = `run -p ${env.PGPORT}:${env.PGPORT} --name oshiete-db -e POSTGRES_USER=${env.PGUSER} -e POSTGRES_DB=${env.PGDATABASE} -e POSTGRES_PASSWORD=${env.PGPASSWORD} -v ${volumeName}:/var/lib/postgresql/data -d postgres:${env.PGVERSION}`;
+    const startCommand = `run -p ${env.PGPORT}:${env.PGPORT} --name ${containerName} -e POSTGRES_USER=${env.PGUSER} -e POSTGRES_DB=${env.PGDATABASE} -e POSTGRES_PASSWORD=${env.PGPASSWORD} -v ${volumeName}:/var/lib/postgresql/data -d postgres:${env.PGVERSION}`;
 
     const spinner = ora({
         spinner: 'line',
@@ -109,7 +110,7 @@ let startContainer = async function () {
     spinner.start();
 
     try {
-        await __dockerPromiseWrapper('start oshiete-db');
+        await __dockerPromiseWrapper(`start ${containerName}`);
 
         spinner.stop();
         console.log('🚀 Postgres started!');
@@ -133,7 +134,7 @@ let stopContainer = async function () {
     spinner.start();
 
     try {
-        await __dockerPromiseWrapper('stop oshiete-db');
+        await __dockerPromiseWrapper(`stop ${containerName}`);
 
         spinner.stop();
         console.log('✋ Postgres stopped!');
@@ -149,7 +150,7 @@ async function __getContainerInfo() {
     try {
         let output = await __dockerPromiseWrapper('ps --all');
 
-        return output.containerList.find(x => x.names === 'oshiete-db');
+        return output.containerList.find(x => x.names === containerName);
     }
     catch (err) {
         // just bubble up like soda pop
@@ -193,7 +194,7 @@ let checkDocker = async function () {
 };
 
 let cleanUpContainer = function () {
-
+    // TODO
 };
 
 export {
