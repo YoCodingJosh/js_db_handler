@@ -1,10 +1,11 @@
 import { config as dotenvConfig } from 'dotenv';
 
 import { showHelp } from './helpers/help.js';
-import { createContainer, startContainer, stopContainer, checkContainerCreated, checkContainerRunning, checkDocker } from './helpers/docker.js';
+import { createContainer, startContainer, stopContainer, checkContainerCreated, checkContainerRunning, checkDocker, checkVolumeExists, createVolume, removeVolume } from './helpers/docker.js';
 import { closeDB, DB, initDB } from './helpers/db.js';
 
 import { __dirname } from './path.js'
+import { sleepFunction, timeoutPromise } from './utils.js';
 
 // force local env so no shenanigans can happen ;)
 dotenvConfig({ path: `${__dirname}/local.env` });
@@ -23,8 +24,14 @@ if (!await checkDocker()) {
 }
 
 if (args[0] === '--start-dev') {
-    const isFreshStart = !await checkContainerCreated();
-    if (isFreshStart) {
+    const wasContainerCreated = await checkContainerCreated();
+    const wasVolumeCreated = await checkVolumeExists();
+
+    if (!wasVolumeCreated) {
+        await createVolume();
+    }
+
+    if (!wasContainerCreated) {
         await createContainer(process.env);
     }
 
@@ -32,9 +39,14 @@ if (args[0] === '--start-dev') {
         await startContainer();
     }
     else {
-        if (!isFreshStart) {
+        if (wasContainerCreated) {
             console.log('😸 Postgres already started.');
         }
+    }
+
+    // there's a race condition between when the container is ready vs when postgres is ready
+    if (!wasContainerCreated) {
+        await sleepFunction(1250, '😴 Resting and waiting for Postgres to be ready', '🌞 Well rested');
     }
 
     initDB(process.env);
@@ -43,8 +55,7 @@ if (args[0] === '--start-dev') {
 
     closeDB();
 }
-
-if (args[0] == '--stop-dev') {
+else if (args[0] === '--stop-dev') {
     if (!await checkContainerCreated()) {
         console.log('💡 Could not stop the Postgres container. Perhaps it was not created? 🤔💭💀');
         process.exit(-2);
@@ -56,4 +67,21 @@ if (args[0] == '--stop-dev') {
     }
 
     await stopContainer();
+}
+else if (args[0] === '--reset-data') {
+    try {
+        if (!await checkVolumeExists()) {
+            console.info("you good! there's no data to reset. 😊");
+            process.exit(0);
+        }
+        
+        // TODO: remove container lmao
+
+        await removeVolume();
+
+        console.log('🔥💾 Data was reset!');
+    }
+    catch (err) {
+        throw err;
+    }
 }

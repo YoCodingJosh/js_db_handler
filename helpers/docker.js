@@ -7,13 +7,51 @@ import ora from 'ora';
 
 const defaultDockerOptions = new DockerOptions(null, __dirname, false);
 
+const volumeName = 'oshiete-data-volume';
+
+let createVolume = async function () {
+    const command = `volume create ${volumeName}`;
+
+    try {
+        await __dockerPromiseWrapper(command);
+    }
+    catch (err) {
+        throw err;
+    }
+};
+
+let checkVolumeExists = async function () {
+    const command = `volume ls -q`;
+
+    try {
+        let data = await __dockerPromiseWrapper(command);
+
+        // for some reason we only get the raw output? oh well, just do a includes for our volume name.
+        return data.raw.includes(volumeName);
+    }
+    catch (err) {
+        throw err;
+    }
+};
+
+let removeVolume = async function () {
+    const command = `volume rm ${volumeName}`;
+
+    try {
+        await __dockerPromiseWrapper(command);
+    }
+    catch (err) {
+        throw err;
+    }
+}
+
 /**
  * Pulls the latest Postgres Docker images and starts the database.
  * @param {NodeJS.ProcessEnv} env Environment variables that have the database credentials
  */
 let createContainer = async function (env) {
     const pullPostgresImageCommand = `pull postgres:${env.PGVERSION}`;
-    const startCommand = `run -p ${env.PGPORT}:${env.PGPORT} --name oshiete-db -e POSTGRES_USER=${env.PGUSER} -e POSTGRES_DB=${env.PGDATABASE} -e POSTGRES_PASSWORD=${env.PGPASSWORD} -d postgres:${env.PGVERSION}`;
+    const startCommand = `run -p ${env.PGPORT}:${env.PGPORT} --name oshiete-db -e POSTGRES_USER=${env.PGUSER} -e POSTGRES_DB=${env.PGDATABASE} -e POSTGRES_PASSWORD=${env.PGPASSWORD} -v ${volumeName}:/var/lib/postgresql/data -d postgres:${env.PGVERSION}`;
 
     const spinner = ora({
         spinner: 'line',
@@ -44,11 +82,11 @@ let createContainer = async function (env) {
 /**
  * EZPZ wrapper around the stupid callbacks because the wrapper I'm using is stupid
  * @param {string} command Command for docker to run 
- * @param {DockerOptions|undefined} options Optional options to pass in to Docker. Defaults to defaultDockerOptions defined at the top 
+ * @param {DockerOptions?} options Optional options to pass in to Docker. Defaults to defaultDockerOptions defined at the top 
  * @returns {Promise} a promise that you'll need to await to snatch that value
  */
 async function __dockerPromiseWrapper(command, options) {
-    if (options === undefined) options = defaultDockerOptions
+    if (!options) options = defaultDockerOptions
     let docker = new Docker(options);
 
     return new Promise((resolve, reject) => {
@@ -159,6 +197,9 @@ let cleanUpContainer = function () {
 };
 
 export {
+    createVolume,
+    checkVolumeExists,
+    removeVolume,
     createContainer,
     startContainer,
     stopContainer,
