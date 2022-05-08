@@ -2,6 +2,10 @@
 
 import { DB } from "../helpers/db.js";
 
-export default async function prepare() {
+import { statuses } from './migration-statuses.json' assert { type: `json` };
 
+import 'fs';
+
+export default async function prepare() {
+    
 };

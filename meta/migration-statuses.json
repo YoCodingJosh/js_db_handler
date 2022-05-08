@@ -1,18 +1,20 @@
-[
-    {
-        "status": "Queued",
-        "description": "This migration was queued up to be processed next."
-    },
-    {
-        "status": "Processing",
-        "description": "This migration is currently running."
-    },
-    {
-        "status": "Success",
-        "description": "This migration has completed successfully."
-    },
-    {
-        "status": "Failure",
-        "description": "This migration was not successful. Inspect the message column to see error details."
-    }
-]
+{
+    "statuses": [
+        {
+            "status": "Queued",
+            "description": "This migration was queued up to be processed next."
+        },
+        {
+            "status": "Processing",
+            "description": "This migration is currently running."
+        },
+        {
+            "status": "Success",
+            "description": "This migration has completed successfully."
+        },
+        {
+            "status": "Failure",
+            "description": "This migration was not successful. Inspect the message column to see error details."
+        }
+    ]
+}
