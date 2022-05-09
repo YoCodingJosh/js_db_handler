@@ -35,12 +35,14 @@ if (args[0] === '--start-dev') {
         await createContainer(process.env);
     }
 
-    if (!await checkContainerRunning()) {
+    const wasContainerStarted = await checkContainerRunning();
+
+    if (!wasContainerStarted) {
         await startContainer();
     }
 
     // there's a race condition between when the container is ready vs when postgres is ready
-    if (!wasContainerCreated) {
+    if (!wasContainerCreated || !wasContainerStarted) {
         await sleepFunction(1250, '😴 Resting and waiting for Postgres to be ready...', '🌞 Well rested');
     }
 
