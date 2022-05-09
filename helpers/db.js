@@ -79,9 +79,12 @@ class DB {
 
         spinner.start();
 
-        await prepare();
+        await prepare(this.pool);
 
         spinner.stop();
+
+        // TODO: tell user the outcome (like need to perform X migrations, or all good)
+        console.log('📚✅ Done checking migrations.');
     }
 };
 

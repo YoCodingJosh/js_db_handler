@@ -1,22 +1,22 @@
 {
     "statuses": [
         {
-            "ordinal": 0,
+            "ordinal": 1,
             "status": "Queued",
-            "description": "This migration was queued up to be processed next."
+            "description": "This migration is queued up to be processed next."
         },
         {
-            "ordinal": 1,
+            "ordinal": 2,
             "status": "Processing",
             "description": "This migration is currently running."
         },
         {
-            "ordinal": 2,
+            "ordinal": 3,
             "status": "Success",
             "description": "This migration has completed successfully."
         },
         {
-            "ordinal": 3,
+            "ordinal": 4,
             "status": "Failure",
             "description": "This migration was not successful. Inspect the message column to see error details."
         }
