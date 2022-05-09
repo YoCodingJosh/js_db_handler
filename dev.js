@@ -5,7 +5,7 @@ import { createContainer, startContainer, stopContainer, checkContainerCreated, 
 import { closeDB, DB, initDB } from './helpers/db.js';
 
 import { __dirname } from './path.js'
-import { sleepFunction, timeoutPromise } from './utils.js';
+import { sleepFunction } from './utils.js';
 
 // force local env so no shenanigans can happen ;)
 dotenvConfig({ path: `${__dirname}/local.env` });
@@ -47,6 +47,8 @@ if (args[0] === '--start-dev') {
     initDB(process.env);
 
     await DB.checkDatabaseConnection();
+
+    await DB.processMigrations();
 
     closeDB();
 }

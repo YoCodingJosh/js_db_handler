@@ -1,3 +1,6 @@
+// Unfortunately, you will need to copy/paste this if you need nested directory support.
+// TODO: Look into using import.meta.resolve once it's not experimental?
+
 import path from 'path';
 import { fileURLToPath } from 'url';
 

@@ -5,6 +5,8 @@ import ora from 'ora';
 
 import { timeoutPromise, bookSpinner } from '../utils.js';
 
+import prepare from '../meta/index.js';
+
 function __createConnectionPool(env) {
     return new Pool({
         user: env.PGUSER,
@@ -77,13 +79,9 @@ class DB {
 
         spinner.start();
 
-        await timeoutPromise((resolve) => {
-            spinner.stop();
+        await prepare();
 
-            console.log('✅ Checked migrations!');
-
-            resolve();
-        }, 3333);
+        spinner.stop();
     }
 };
 
