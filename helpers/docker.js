@@ -193,7 +193,7 @@ let checkDocker = async function () {
     }
 };
 
-let cleanUpContainer = function () {
+let cleanUpContainer = async function () {
     // TODO
 };
 
