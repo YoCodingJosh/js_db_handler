@@ -5,7 +5,7 @@ import ora from 'ora';
 
 import { timeoutPromise, bookSpinner } from '../utils.js';
 
-import prepare from '../meta/index.js';
+import prepareMetamigrations from '../meta/index.js';
 
 function __createConnectionPool(env) {
     return new Pool({
@@ -79,7 +79,7 @@ class DB {
 
         spinner.start();
 
-        await prepare(this.pool);
+        await prepareMetamigrations(this.pool);
 
         spinner.stop();
 
