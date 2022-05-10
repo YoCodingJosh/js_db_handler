@@ -80,6 +80,15 @@ let createContainer = async function (env) {
     }
 };
 
+let removeContainer = async function () {
+    try {
+        await __dockerPromiseWrapper(`rm ${containerName}`);
+    }
+    catch (err) {
+        throw err;
+    }
+};
+
 /**
  * EZPZ wrapper around the stupid callbacks because the wrapper I'm using is stupid
  * @param {string} command Command for docker to run 
@@ -193,19 +202,15 @@ let checkDocker = async function () {
     }
 };
 
-let cleanUpContainer = async function () {
-    // TODO
-};
-
 export {
     createVolume,
     checkVolumeExists,
     removeVolume,
     createContainer,
+    removeContainer,
     startContainer,
     stopContainer,
     checkContainerCreated,
     checkContainerRunning,
     checkDocker,
-    cleanUpContainer,
 };

@@ -1,7 +1,7 @@
 import { config as dotenvConfig } from 'dotenv';
 
 import { showHelp } from './helpers/help.js';
-import { createContainer, startContainer, stopContainer, checkContainerCreated, checkContainerRunning, checkDocker, checkVolumeExists, createVolume, removeVolume, cleanUpContainer } from './helpers/docker.js';
+import { createContainer, startContainer, stopContainer, checkContainerCreated, checkContainerRunning, checkDocker, checkVolumeExists, createVolume, removeVolume, removeContainer } from './helpers/docker.js';
 import { closeDB, DB, initDB } from './helpers/db.js';
 
 import { __dirname } from './path.js'
@@ -69,14 +69,17 @@ else if (args[0] === '--stop-dev') {
 }
 else if (args[0] === '--reset-data') {
     try {
-        if (!await checkVolumeExists()) {
-            console.info("you good! there's no data to reset. 😊");
-            process.exit(0);
-        }
+        if (await checkContainerCreated()) {
+            if (await checkContainerRunning()) {
+                await stopContainer();
+            }
         
-        await cleanUpContainer();
+            await removeContainer();
+        }
 
-        await removeVolume();
+        if (await checkVolumeExists()) {
+            await removeVolume();
+        }
 
         console.log('🔥💾 Data was reset!');
     }
