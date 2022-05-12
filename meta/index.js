@@ -57,6 +57,7 @@ async function migrationStatusesTable(client) {
         // If there are no statuses, then we need to add them.
         // This should never realistically happen, but ya never know... :S
         if (tableDataCheckResult.rowCount === 0) {
+            // TODO: What if the statuses have changed from when the table was created?
             await insertStatusesIntoMigrationStatusesTable(client);
         }
         else {
@@ -82,7 +83,7 @@ async function migrationsTable(client) {
         let tableCreationResult = await client.query(script);
     }
     else {
-
+        // TODO: Handle this later.
     }
 }
 
