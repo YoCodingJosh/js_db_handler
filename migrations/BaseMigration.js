@@ -6,18 +6,14 @@ export default class BaseMigration {
      * @param {pkg.PoolClient} client The database connection
      */
     constructor(client) {
-        this._client = client;
-    }
-
-    get client() {
-        return this._client;
+        this.client = client;
     }
 
     /**
      * Sucess is the path forward or something profound like that.
      */
     upgrade() {
-        return;   
+        return;
     }
 
     /**

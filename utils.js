@@ -38,8 +38,28 @@ let sleepFunction = async function (time, waitMessage, completeMessage) {
     }, time);
 };
 
+let hasOnlyJavaScriptIdentiferSafeCharacters = function (str) {
+    return /[a-zA-Z_$][0-9a-zA-Z_$]*/.test(str);
+};
+
+let stringIsNotJavaScriptReservedWord = function (str) {
+    // there should be a better way to do this lmao (not using eval!)
+    let naughtyWords = [
+        'break', 'case', 'catch', 'class', 'const', 'continue', 'debugger',
+        'default', 'delete', 'for', 'else', 'export', 'extends', 'finally',
+        'do', 'function', 'if', 'import', 'in', 'instanceof', 'new', 'return',
+        'super', 'switch', 'this', 'throw', 'try', 'typeof', 'var', 'void',
+        'while', 'with', 'yield', 'enum', 'implements', 'interface', 'await',
+        'package', 'private', 'protected', 'public', 'static', 'yield', 'let',
+    ];
+
+    return !naughtyWords.includes(str);
+}
+
 export {
     timeoutPromise,
     bookSpinner,
     sleepFunction,
+    hasOnlyJavaScriptIdentiferSafeCharacters,
+    stringIsNotJavaScriptReservedWord,
 };

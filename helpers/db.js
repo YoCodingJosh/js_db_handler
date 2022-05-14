@@ -5,7 +5,7 @@ import ora from 'ora';
 
 import { timeoutPromise, bookSpinner } from '../utils.js';
 
-import prepareMetamigrations from '../meta/index.js';
+import { prepareMetamigrations } from '../meta/index.js';
 
 function __createConnectionPool(env) {
     return new Pool({

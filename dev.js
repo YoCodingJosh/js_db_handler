@@ -5,7 +5,7 @@ import { createContainer, startContainer, stopContainer, checkContainerCreated, 
 import { closeDB, DB, initDB } from './helpers/db.js';
 
 import { __dirname } from './path.js'
-import { sleepFunction } from './utils.js';
+import { hasOnlyJavaScriptIdentiferSafeCharacters, sleepFunction, stringIsNotJavaScriptReservedWord } from './utils.js';
 
 // force local env so no shenanigans can happen ;)
 dotenvConfig({ path: `${__dirname}/local.env` });
@@ -86,4 +86,20 @@ else if (args[0] === '--reset-data') {
     catch (err) {
         throw err;
     }
+}
+else if (args[0] === '--create-migration') {
+    if (args.length == 1) {
+        console.error('❓ You need to pass in what you want to name your migration.');
+        process.exit(-5);
+    }
+
+    if (!hasOnlyJavaScriptIdentiferSafeCharacters(args[1]) || !stringIsNotJavaScriptReservedWord(args[1])) {
+        console.error('⛔ Migration name must be a valid JavaScript identifier and not a reserved word!');
+        process.exit(-6);
+    }
+
+    // TODO: Implement
+}
+else if (args[0] === '--run-migrations') {
+
 }

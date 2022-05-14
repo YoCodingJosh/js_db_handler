@@ -93,13 +93,26 @@ async function migrationsTable(client) {
  */
 async function createTables(client) {
     await migrationStatusesTable(client);
-    // await migrationsTable(client);
+    await migrationsTable(client);
 }
 
 /**
  * Prepares the meta migrations
  * @param {pkg.PoolClient} client 
  */
-export default async function prepareMetamigrations(client) {
+async function prepareMetamigrations(client) {
     await createTables(client);
+};
+
+/**
+ * Checks the processed migrations and determines where to start.
+ * @param {pkg.PoolClient} client 
+ */
+async function checkProcessedMigrations(client) {
+    
+}
+
+export {
+    prepareMetamigrations,
+    checkProcessedMigrations,
 };
