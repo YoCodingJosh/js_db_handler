@@ -60,10 +60,10 @@ let stringIsNotJavaScriptReservedWord = function (str) {
 
 /**
  * generates a random hash string - meant for migration ids
- * @returns a SHA256 hash of the date and a cool string
+ * @returns a hash of the date and a cool string
  */
 let generateRandomHash = function() {
-    return createHmac('sha256', 'HYPEWORKS #1').update(Buffer.from(new String(new Date().getTime()), 'utf-8')).digest('hex');
+    return createHmac('SHA1', 'HYPEWORKS #1').update(Buffer.from(new String(new Date().getTime()), 'utf-8')).digest('hex');
 };
 
 /**
