@@ -21,24 +21,23 @@ export default async function createMigration(name, description) {
     let isFastForwarding = false;
 
     tokenizedScript.forEach(token => {
-        console.log(token);
-
         let interpolatedToken = token;
-
-        // TODO: Need to wrap the $$ token in something so we can capture the remaining of the string (like ; or end-quotes)
 
         if (token.startsWith('$$')) {
             let optionalIndex = token.indexOf('?', 2);
-            let argIndexOrdinal = parseInt(token.substring(2, optionalIndex == -1 ? undefined : optionalIndex));
+            let endIndex = token.lastIndexOf('$$');
+            let argIndexOrdinal = parseInt(token.substring(2, optionalIndex == -1 ? endIndex : optionalIndex));
             let actualArgIndexOrdinal = argIndexOrdinal - 1;
+            let restOfTheToken = token.substring(endIndex + 2);
 
             if (optionalIndex !== -1) {
                 if (!generationArgs[actualArgIndexOrdinal]) {
                     // TODO: probably should make it easier to provide different options
-                    if (token.substring(optionalIndex).endsWith('dd')) {
+                    if (token.includes('dd', optionalIndex)) {
                         // if it's a dd (vim delete line), just skip it's containing line
                         // TODO: rewind to last new line (contains \n) and remove each token, and then fast forward to next token after new line (containing \n)
                         //      this will be a pain in the ass
+                        return;
                     }
                     else {
                         // simply skip this token :)
@@ -50,7 +49,7 @@ export default async function createMigration(name, description) {
             if (!generationArgs[actualArgIndexOrdinal]) {
                 throw `Unexpected falsy value for argument index ${argIndexOrdinal} - it should be a string/int passed in`;
             } else {
-                interpolatedToken = generationArgs[actualArgIndexOrdinal];
+                interpolatedToken = generationArgs[actualArgIndexOrdinal] + restOfTheToken;
             }
         }
 
