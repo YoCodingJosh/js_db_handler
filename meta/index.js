@@ -5,7 +5,7 @@ import pkg from 'pg';
 // TODO: do this once it gets out of the experimental state ;)
 // import statuses from './migration-statuses.json' assert { type: 'json' };
 
-import { readFile } from "fs/promises";
+import { readFile } from 'fs/promises';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -109,7 +109,7 @@ async function prepareMetamigrations(client) {
  * @param {pkg.PoolClient} client 
  */
 async function checkProcessedMigrations(client) {
-    
+    // TODO:
 }
 
 export {

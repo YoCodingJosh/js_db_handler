@@ -1,5 +1,9 @@
 import pkg from 'pg';
 
+/**
+ * Base migration that other migrations should inherit from.
+ * @author Josh Kennedy
+ */
 export default class BaseMigration {
     /**
      * Internal constructor that will set up the database connection for you.

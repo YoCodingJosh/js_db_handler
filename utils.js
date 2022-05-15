@@ -1,5 +1,7 @@
 import ora from 'ora';
 
+import { createHmac } from 'crypto';
+
 /**
  * Executes a function when after a specified amount of time has been elasped.
  * @param {Function} callback callback that passes in resolve and reject
@@ -54,7 +56,24 @@ let stringIsNotJavaScriptReservedWord = function (str) {
     ];
 
     return !naughtyWords.includes(str);
-}
+};
+
+/**
+ * generates a random hash string - meant for migration ids
+ * @returns a SHA256 hash of the date and a cool string
+ */
+let generateRandomHash = function() {
+    return createHmac('sha256', 'HYPEWORKS #1').update(Buffer.from(new String(new Date().getTime()), 'utf-8')).digest('hex');
+};
+
+/**
+ * Gets the user name from the OS.
+ * @returns the currently logged in user's username
+ */
+let getUsername = function() {
+    // TODO: Maybe check git user?
+    return process.env.USER ?? process.env.USERNAME;
+};
 
 export {
     timeoutPromise,
@@ -62,4 +81,6 @@ export {
     sleepFunction,
     hasOnlyJavaScriptIdentiferSafeCharacters,
     stringIsNotJavaScriptReservedWord,
+    generateRandomHash,
+    getUsername,
 };

@@ -5,7 +5,8 @@ import { createContainer, startContainer, stopContainer, checkContainerCreated, 
 import { closeDB, DB, initDB } from './helpers/db.js';
 
 import { __dirname } from './path.js'
-import { hasOnlyJavaScriptIdentiferSafeCharacters, sleepFunction, stringIsNotJavaScriptReservedWord } from './utils.js';
+import { hasOnlyJavaScriptIdentiferSafeCharacters, sleepFunction } from './utils.js';
+import createMigration from './migrations/create-migration.js';
 
 // force local env so no shenanigans can happen ;)
 dotenvConfig({ path: `${__dirname}/local.env` });
@@ -93,12 +94,32 @@ else if (args[0] === '--create-migration') {
         process.exit(-5);
     }
 
-    if (!hasOnlyJavaScriptIdentiferSafeCharacters(args[1]) || !stringIsNotJavaScriptReservedWord(args[1])) {
-        console.error('⛔ Migration name must be a valid JavaScript identifier and not a reserved word!');
-        process.exit(-6);
-    }
+    let nameArgs = args.slice(1);
 
-    // TODO: Implement
+    // if (!stringIsNotJavaScriptReservedWord(args[1])) {
+    // }
+
+    let migrationName = '';
+    let migrationDescription = '';
+
+    // if it's multiple word then turn in to PascalCase
+    if (nameArgs.length >= 1) {
+        nameArgs.forEach(arg => {
+            if (!hasOnlyJavaScriptIdentiferSafeCharacters(arg)) {
+                console.error('⛔ Migration name must be a valid JavaScript identifier!');
+                process.exit(-6);
+            }
+
+            let pascalized = arg[0].toUpperCase() + arg.substring(1);
+
+            migrationName += pascalized;
+
+            if (nameArgs.length > 1) {   
+                migrationDescription += arg + (nameArgs.indexOf(arg) === nameArgs.length - 1 ? '' : ' ');
+            }
+        });
+    }
+    await createMigration(migrationName, migrationDescription === '' ? undefined : migrationDescription);
 }
 else if (args[0] === '--run-migrations') {
 

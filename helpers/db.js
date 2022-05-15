@@ -5,7 +5,7 @@ import ora from 'ora';
 
 import { timeoutPromise, bookSpinner } from '../utils.js';
 
-import { prepareMetamigrations } from '../meta/index.js';
+import { checkProcessedMigrations, prepareMetamigrations } from '../meta/index.js';
 
 function __createConnectionPool(env) {
     return new Pool({
@@ -81,10 +81,12 @@ class DB {
 
         await prepareMetamigrations(this.pool);
 
+        await checkProcessedMigrations(this.pool);
+
         spinner.stop();
 
         // TODO: tell user the outcome (like need to perform X migrations, or all good)
-        console.log('📚✅ Done checking migrations.');
+        console.log('📚✅ Checked migrations!');
     }
 };
 
