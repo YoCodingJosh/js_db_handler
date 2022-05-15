@@ -25,6 +25,8 @@ export default async function createMigration(name, description) {
 
         let interpolatedToken = token;
 
+        // TODO: Need to wrap the $$ token in something so we can capture the remaining of the string (like ; or end-quotes)
+
         if (token.startsWith('$$')) {
             let optionalIndex = token.indexOf('?', 2);
             let argIndexOrdinal = parseInt(token.substring(2, optionalIndex == -1 ? undefined : optionalIndex));
